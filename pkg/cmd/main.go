@@ -79,6 +79,8 @@ var (
 
 	iface = flags.String("iface", "", `network interface to listen on. If undefined, the nodes
                  default interface will be used instead`)
+	
+	clearIPVS = flags.Bool("clear-ipvs", true, `clear all ipvsadm rule at startup, default is true`)
 )
 
 func main() {
@@ -117,11 +119,11 @@ func main() {
 		glog.Fatalf("unexpected error: %v", err)
 	}
 
-	err = resetIPVS()
-	if err != nil {
-		glog.Fatalf("unexpected error: %v", err)
-	}
-
+	if *clearIPVS {
+                glog.Info("resetting all ipvs rules using command ipvsadm -C")
+                resetIPVS()
+        }
+	
 	if *proxyMode {
 		copyHaproxyCfg()
 	}
